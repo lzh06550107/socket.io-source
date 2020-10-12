@@ -1,51 +1,60 @@
+version: '3'
 
-nginx:
-  build: ./nginx
-  links:
-    - server-john
-    - server-paul
-    - server-george
-    - server-ringo
-  ports:
-   - "3000:80"
+services:
+  nginx:
+    build: ./nginx
+    links:
+      - server-john
+      - server-paul
+      - server-george
+      - server-ringo
+    ports:
+      - "80:80"
 
-server-john:
-  build: ./server
-  links:
-    - redis
-  expose:
-    - "3000"
-  environment:
-    - NAME=John
+  server-john:
+    image: chat
+    build: ./server
+    links:
+      - redis
+    expose:
+      - "3000"
+    environment:
+      - NAME=John
 
-server-paul:
-  build: ./server
-  links:
-    - redis
-  expose:
-    - "3000"
-  environment:
-    - NAME=Paul
+  server-paul:
+    image: chat
+    depends_on:
+      - server-john
+    links:
+      - redis
+    expose:
+      - "3000"
+    environment:
+      - NAME=Paul
 
-server-george:
-  build: ./server
-  links:
-    - redis
-  expose:
-    - "3000"
-  environment:
-    - NAME=George
+  server-george:
+    image: chat
+    depends_on:
+      - server-john
+    links:
+      - redis
+    expose:
+      - "3000"
+    environment:
+      - NAME=George
 
-server-ringo:
-  build: ./server
-  links:
-    - redis
-  expose:
-    - "3000"
-  environment:
-    - NAME=Ringo
+  server-ringo:
+    image: chat
+    depends_on:
+      - server-john
+    links:
+      - redis
+    expose:
+      - "3000"
+    environment:
+      - NAME=Ringo
 
-redis:
-  image: redis:alpine
-  expose:
-    - "6379"
+  redis:
+    image: redis:alpine
+    expose:
+      - "6379"
